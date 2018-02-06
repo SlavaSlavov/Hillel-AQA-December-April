@@ -8,12 +8,10 @@ public class UnitTest {
         lower1450KO();
     }
 
-
     //test data
     private static String testEmail = "abc@gmail.com,sdfs@gmail.com,abc@gmail.com,abc@gmail.com,asd@yandex.ru,abc@gmail.com";
     private static String testLower100 = "95";
     private static String testLower1450 = "2000";
-
 
     //test
     private static void validEmailOK(){

@@ -7,7 +7,9 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
+import org.testng.ITestResult;
 import org.testng.annotations.*;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class SmokeTest {
@@ -37,8 +39,7 @@ public class SmokeTest {
     }
     @DataProvider(name = "Ticket status")
     public Object[][] dataForTicketStatus(){
-        return new  Object[][]{
-                {"In Progress"}
+        return new  Object[][]{                {"In Progress"}
         };
     }
     // ELEMENTS
@@ -115,6 +116,15 @@ public class SmokeTest {
         driver.findElement(By.xpath("//a[contains(@class, 'issueaction-workflow-transition') and contains(.//span, '" + status + "')]")).click();
         sleep(5);
         Assert.assertEquals(status.toLowerCase(), driver.findElement(By.cssSelector("span#status-val > span")).getText().toLowerCase());
+    }
+
+    @AfterMethod
+    void afterM(ITestResult testResult){
+        if (!testResult.isSuccess()){
+            System.out.println(testResult.getMethod().getDescription() + " - Failed with data: " + Arrays.toString(testResult.getParameters()));
+        } else {
+            System.out.println(testResult.getMethod().getDescription() + " - Passed with data: " + Arrays.toString(testResult.getParameters()));
+        }
     }
 
     @AfterTest

@@ -39,7 +39,8 @@ public class SmokeTest {
     }
     @DataProvider(name = "Ticket status")
     public Object[][] dataForTicketStatus(){
-        return new  Object[][]{                {"In Progress"}
+        return new  Object[][]{
+                {"In Progress"}
         };
     }
     // ELEMENTS

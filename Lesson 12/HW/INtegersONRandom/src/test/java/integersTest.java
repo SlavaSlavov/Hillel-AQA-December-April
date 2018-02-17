@@ -1,19 +1,18 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.testng.Assert;
 import org.testng.annotations.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 
 public class integersTest {
-
 
     WebDriver driver;
     WebDriverWait wait;
@@ -34,6 +33,15 @@ public class integersTest {
         driver.findElement(By.cssSelector("[value=\"Get Numbers\"]")).click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".data")));
         String data = driver.findElement(By.cssSelector(".data")).getText();
-        data.matches("(\\d{1,2}|100)");
+//        System.out.println(data);
+        Assert.assertTrue(data.matches("(\\d{1,2}|100)\\s?"));
+//        String[] arrayOfData = data.split("\\d{1,2}|100");
+//        System.out.println(Arrays.toString(arrayOfData));
+//        int[] n1 = new int[parts.length];
+//        for(int n = 0; n < parts.length; n++) {
+//            n1[n] = Integer.parseInt(parts[n]);
+//        }
+
+
     }
 }

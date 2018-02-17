@@ -8,6 +8,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.*;
+
+import java.security.Key;
 import java.util.concurrent.TimeUnit;
 
 public class SmokeTest {
@@ -32,24 +34,29 @@ public class SmokeTest {
     @DataProvider(name = "Create ticket")
     public Object[][] dataForTicketFields(){
         return new Object[][]{
-                {"autorob","forautotests"}
+                {"Hillel Test Projects (HTP)","AUTOTEST"}
         };
     }
     // ELEMENTS
     // Login page elements
     private By loginField = By.cssSelector("input#login-form-username");
     private By passField = By.cssSelector("input#login-form-password");
-    private By loginButton = By.cssSelector("input#login");
 
     // Home page elements
     private By userOptions = By.cssSelector("a#header-details-user-fullname");
     private By createIssueButton = By.cssSelector("a#create_link");
+    private By issuesButton = By.cssSelector("a#find_link");
+    private By firstRecentIssueOption = By.cssSelector("div#issues_history_main > ul > li:nth-child(1) > a");
+
+    // "Create issue" modal window elements
+    private By projectNameField = By.cssSelector("input#project-field");
+    private By summaryField = By.cssSelector("input#summary");
 
     //METHODS
     public static WebElement clearAndFill(By selector, String data) {
         WebElement element = driver.findElement(selector);
         element.clear();
-        element.sendKeys(data);
+        element.sendKeys(data, Keys.TAB);
         return element;
     }
 
@@ -72,36 +79,34 @@ public class SmokeTest {
         Assert.assertEquals(account, driver.findElement(userOptions).getAttribute("data-username"));
     }
 
-    @Test (priority = 2)
-    private void createTicket(){
-        driver.findElement(By.cssSelector(createIssueButton)).click();
+    @Test (priority = 2, dataProvider = "Create ticket", description = "Create ticket")
+    private void createTicket(String projectName, String summaryText){
+        driver.findElement(createIssueButton).click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#create-issue-dialog")));
-
-        driver.findElement(By.cssSelector("#project-field")).sendKeys("Hillel QA 1/11/2018 (HQ)", Keys.TAB);
-//        driver.findElement(By.cssSelector("#summary")).click();
+        clearAndFill(projectNameField, projectName+", Keys.TAB");
         sleep(2);
-        driver.findElement(By.cssSelector("#summary")).sendKeys("AUTOTEST");
-//        driver.findElement(By.cssSelector("#create-issue-submit")).click();
-//        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#aui-flag-container")));
-//        String testline =  driver.findElement(By.cssSelector(".issue-created-key.issue-link")).getAttribute("data-issue-key");
-//        Assert.assertEquals("Issue " + testline + " - AUTOTEST has been successfully created.", driver.findElement(By.cssSelector(".aui-message.aui-message-success")).getText());
-//        sleep(5);
+        clearAndFill(summaryField,summaryText).submit();
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#aui-flag-container")));
+        Assert.assertEquals("Issue " + driver.findElement(By.cssSelector(".issue-created-key.issue-link")).getAttribute("data-issue-key") +
+                " - " + summaryText + " has been successfully created.",
+                driver.findElement(By.cssSelector(".aui-message.aui-message-success")).getText());
+        sleep(5);
     }
 
     @Test (priority = 3)
     private void openTicket(){
-        driver.findElement(By.cssSelector("#find_link")).click();
+        driver.findElement(issuesButton).click();
         sleep(2);
-        driver.findElement(By.cssSelector("div#issues_history_main > ul > li:nth-child(1) > a")).click();
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#issue-content")));
+        driver.findElement(firstRecentIssueOption).click();
+//        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#issue-content")));
     }
-
-    @Test (priority = 4)
-    private void changeTicketStatus(){
-        driver.findElement(By.cssSelector("#opsbar-opsbar-transitions > li:nth-child(2)")).click();
-        sleep(5);
-        Assert.assertEquals("IN PROGRESS", driver.findElement(By.cssSelector("#status-val > span")).getText());
-    }
+//
+//    @Test (priority = 4)
+//    private void changeTicketStatus(){
+//        driver.findElement(By.cssSelector("#opsbar-opsbar-transitions > li:nth-child(2)")).click();
+//        sleep(5);
+//        Assert.assertEquals("IN PROGRESS", driver.findElement(By.cssSelector("#status-val > span")).getText());
+//    }
 
 //    @AfterTest
 //    private void finish(){

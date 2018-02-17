@@ -8,8 +8,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.*;
-
-import java.security.Key;
 import java.util.concurrent.TimeUnit;
 
 public class SmokeTest {
@@ -31,10 +29,16 @@ public class SmokeTest {
                 {"autorob","forautotests"}
         };
     }
-    @DataProvider(name = "Create ticket")
+    @DataProvider(name = "Ticket")
     public Object[][] dataForTicketFields(){
         return new Object[][]{
-                {"Hillel Test Projects (HTP)","AUTOTEST"}
+                {"Hillel Test Projects","AUTOTEST"}
+        };
+    }
+    @DataProvider(name = "Ticket status")
+    public Object[][] dataForTicketStatus(){
+        return new  Object[][]{
+                {"In Progress"}
         };
     }
     // ELEMENTS
@@ -51,6 +55,9 @@ public class SmokeTest {
     // "Create issue" modal window elements
     private By projectNameField = By.cssSelector("input#project-field");
     private By summaryField = By.cssSelector("input#summary");
+
+    // Ticket page elements
+    private By issueLinkInHeader = By.cssSelector("a#key-val");
 
     //METHODS
     public static WebElement clearAndFill(By selector, String data) {
@@ -79,11 +86,11 @@ public class SmokeTest {
         Assert.assertEquals(account, driver.findElement(userOptions).getAttribute("data-username"));
     }
 
-    @Test (priority = 2, dataProvider = "Create ticket", description = "Create ticket")
+    @Test (priority = 2, dataProvider = "Ticket", description = "Create ticket")
     private void createTicket(String projectName, String summaryText){
         driver.findElement(createIssueButton).click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#create-issue-dialog")));
-        clearAndFill(projectNameField, projectName+", Keys.TAB");
+        clearAndFill(projectNameField, projectName);
         sleep(2);
         clearAndFill(summaryField,summaryText).submit();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#aui-flag-container")));
@@ -93,23 +100,25 @@ public class SmokeTest {
         sleep(5);
     }
 
-    @Test (priority = 3)
+    @Test (priority = 3, description = "Open ticket")
     private void openTicket(){
         driver.findElement(issuesButton).click();
         sleep(2);
+        String ticketNumber = driver.findElement(firstRecentIssueOption).getAttribute("data-issue-key");
         driver.findElement(firstRecentIssueOption).click();
-//        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#issue-content")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div#issue-content")));
+        Assert.assertEquals(ticketNumber, driver.findElement(issueLinkInHeader).getText());
     }
-//
-//    @Test (priority = 4)
-//    private void changeTicketStatus(){
-//        driver.findElement(By.cssSelector("#opsbar-opsbar-transitions > li:nth-child(2)")).click();
-//        sleep(5);
-//        Assert.assertEquals("IN PROGRESS", driver.findElement(By.cssSelector("#status-val > span")).getText());
-//    }
 
-//    @AfterTest
-//    private void finish(){
-//        driver.close();
-//    }
+    @Test (priority = 4, dataProvider = "Ticket status", description = "Change status")
+    private void changeTicketStatus(String status){
+        driver.findElement(By.xpath("//a[contains(@class, 'issueaction-workflow-transition') and contains(.//span, '" + status + "')]")).click();
+        sleep(5);
+        Assert.assertEquals(status.toLowerCase(), driver.findElement(By.cssSelector("span#status-val > span")).getText().toLowerCase());
+    }
+
+    @AfterTest
+    private void finish(){
+        driver.close();
+    }
 }

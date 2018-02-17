@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 public class Config {
 
-        protected  WebDriver driver;
-        protected  WebDriverWait wait;
+        protected static WebDriver driver;
+        protected static WebDriverWait wait;
 
         public Config (){
         }

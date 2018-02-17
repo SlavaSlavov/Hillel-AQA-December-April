@@ -1,24 +1,56 @@
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.*;
-
 import java.util.concurrent.TimeUnit;
 
 public class SmokeTest {
 
     protected static WebDriver driver;
     protected static WebDriverWait wait;
+
     protected void sleep(int time) {
         try {
             Thread.sleep(time * 1000);
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    @DataProvider(name = "Authorization")
+    public Object[][] dataForAuthorization(){
+        return new Object[][]{
+                {"autorob","forautotests"}
+        };
+    }
+    @DataProvider(name = "Create ticket")
+    public Object[][] dataForTicketFields(){
+        return new Object[][]{
+                {"autorob","forautotests"}
+        };
+    }
+    // ELEMENTS
+    // Login page elements
+    private By loginField = By.cssSelector("input#login-form-username");
+    private By passField = By.cssSelector("input#login-form-password");
+    private By loginButton = By.cssSelector("input#login");
+
+    // Home page elements
+    private By userOptions = By.cssSelector("a#header-details-user-fullname");
+    private By createIssueButton = By.cssSelector("a#create_link");
+
+    //METHODS
+    public static WebElement clearAndFill(By selector, String data) {
+        WebElement element = driver.findElement(selector);
+        element.clear();
+        element.sendKeys(data);
+        return element;
     }
 
     @BeforeTest
@@ -32,34 +64,28 @@ public class SmokeTest {
         driver.get("http://jira.hillel.it:8080");
     }
 
-    @DataProvider(name = "Authorization")
-    public Object[][] dataForAuthorization(){
-        return new Object[][]{
-                {"autorob","forautotests"}
-        };
-    }
-
-    @Test (dataProvider = "Authorization", priority = 1)
+    @Test (priority = 1, dataProvider = "Authorization", description = "Authorization with valid credentials")
     private void logIn (String account, String pass){
-        driver.findElement(By.cssSelector("#login-form-username")).sendKeys(account);
-        driver.findElement(By.cssSelector("#login-form-password")).sendKeys(pass);
-        driver.findElement(By.cssSelector("#login")).click();
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[data-username=\""+account+"\"]")));
+        clearAndFill(loginField,account);
+        clearAndFill(passField,pass).submit();
+        wait.until(ExpectedConditions.presenceOfElementLocated(userOptions));
+        Assert.assertEquals(account, driver.findElement(userOptions).getAttribute("data-username"));
     }
 
     @Test (priority = 2)
     private void createTicket(){
-        driver.findElement(By.cssSelector("#create_link")).click();
+        driver.findElement(By.cssSelector(createIssueButton)).click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#create-issue-dialog")));
-        driver.findElement(By.cssSelector("#project-field")).sendKeys("Hillel QA 1/11/2018 (HQ)");
-        driver.findElement(By.cssSelector("#summary")).click();
+
+        driver.findElement(By.cssSelector("#project-field")).sendKeys("Hillel QA 1/11/2018 (HQ)", Keys.TAB);
+//        driver.findElement(By.cssSelector("#summary")).click();
         sleep(2);
         driver.findElement(By.cssSelector("#summary")).sendKeys("AUTOTEST");
-        driver.findElement(By.cssSelector("#create-issue-submit")).click();
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#aui-flag-container")));
-        String testline =  driver.findElement(By.cssSelector(".issue-created-key.issue-link")).getAttribute("data-issue-key");
-        Assert.assertEquals("Issue " + testline + " - AUTOTEST has been successfully created.", driver.findElement(By.cssSelector(".aui-message.aui-message-success")).getText());
-        sleep(5);
+//        driver.findElement(By.cssSelector("#create-issue-submit")).click();
+//        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#aui-flag-container")));
+//        String testline =  driver.findElement(By.cssSelector(".issue-created-key.issue-link")).getAttribute("data-issue-key");
+//        Assert.assertEquals("Issue " + testline + " - AUTOTEST has been successfully created.", driver.findElement(By.cssSelector(".aui-message.aui-message-success")).getText());
+//        sleep(5);
     }
 
     @Test (priority = 3)
@@ -77,8 +103,8 @@ public class SmokeTest {
         Assert.assertEquals("IN PROGRESS", driver.findElement(By.cssSelector("#status-val > span")).getText());
     }
 
-    @AfterTest
-    private void finish(){
-        driver.close();
-    }
+//    @AfterTest
+//    private void finish(){
+//        driver.close();
+//    }
 }

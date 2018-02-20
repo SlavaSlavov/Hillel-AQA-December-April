@@ -132,19 +132,19 @@ public class SmokeTest {
 //
 //    }
 
-//    @Test (priority = 2, dataProvider = "Ticket", description = "Create ticket")
-//    private void createTicket(String projectName, String summaryText){
-//        driver.findElement(createIssueButton).click();
-//        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#create-issue-dialog")));
-//        clearAndFill(projectNameField, projectName);
-//        sleep(2);
-//        clearAndFill(summaryField,summaryText).submit();
-//        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#aui-flag-container")));
-//        Assert.assertEquals("Issue " + driver.findElement(By.cssSelector(".issue-created-key.issue-link")).getAttribute("data-issue-key") +
-//                " - " + summaryText + " has been successfully created.",
-//                driver.findElement(By.cssSelector(".aui-message.aui-message-success")).getText());
-//        sleep(5);
-//    }
+    @Test (priority = 2, dataProvider = "Ticket", description = "Create ticket")
+    private void createTicket(String projectName, String summaryText){
+        driver.findElement(createIssueButton).click();
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#create-issue-dialog")));
+        clearAndFill(projectNameField, projectName);
+        sleep(2);
+        clearAndFill(summaryField,summaryText).submit();
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#aui-flag-container")));
+        Assert.assertEquals("Issue " + driver.findElement(By.cssSelector(".issue-created-key.issue-link")).getAttribute("data-issue-key") +
+                " - " + summaryText + " has been successfully created.",
+                driver.findElement(By.cssSelector(".aui-message.aui-message-success")).getText());
+        sleep(5);
+    }
 //
 //    @Test (priority = 3, description = "Open ticket")
 //    private void openTicket(){
